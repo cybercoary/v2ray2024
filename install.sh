@@ -3,7 +3,7 @@
 author=233boy
 # github=https://github.com/233boy/v2ray
 
-# bash fonts colors
+# cores de fontes do bash
 red='\e[31m'
 yellow='\e[33m'
 gray='\e[90m'
@@ -20,8 +20,8 @@ _yellow() { echo -e ${yellow}$@${none}; }
 _magenta() { echo -e ${magenta}$@${none}; }
 _red_bg() { echo -e "\e[41m$@${none}"; }
 
-is_err=$(_red_bg 错误!)
-is_warn=$(_red_bg 警告!)
+is_err=$(_red_bg Erro!)
+is_warn=$(_red_bg Aviso!)
 
 err() {
     echo -e "\n$is_err $@\n" && exit 1
@@ -32,18 +32,18 @@ warn() {
 }
 
 # root
-[[ $EUID != 0 ]] && err "当前非 ${yellow}ROOT用户.${none}"
+[[ $EUID != 0 ]] && err "Você não é o ${yellow}ROOT${none}."
 
-# yum or apt-get, ubuntu/debian/centos
+# yum ou apt-get, ubuntu/debian/centos
 cmd=$(type -P apt-get || type -P yum)
-[[ ! $cmd ]] && err "此脚本仅支持 ${yellow}(Ubuntu or Debian or CentOS)${none}."
+[[ ! $cmd ]] && err "Este script suporta apenas ${yellow}(Ubuntu ou Debian ou CentOS)${none}."
 
 # systemd
 [[ ! $(type -P systemctl) ]] && {
-    err "此系统缺少 ${yellow}(systemctl)${none}, 请尝试执行:${yellow} ${cmd} update -y;${cmd} install systemd -y ${none}来修复此错误."
+    err "Este sistema está faltando ${yellow}(systemctl)${none}, tente executar:${yellow} ${cmd} update -y;${cmd} install systemd -y ${none} para corrigir este erro."
 }
 
-# wget installed or none
+# wget instalado ou não
 is_wget=$(type -P wget)
 
 # x64
@@ -57,7 +57,7 @@ amd64 | x86_64)
     is_core_arch="arm64-v8a"
     ;;
 *)
-    err "此脚本仅支持 64 位系统..."
+    err "Este script suporta apenas sistemas de 64 bits..."
     ;;
 esac
 
@@ -83,29 +83,29 @@ tmp_var_lists=(
     is_pkg_ok
 )
 
-# tmp dir
+# dir temporário
 tmpdir=$(mktemp -u)
 [[ ! $tmpdir ]] && {
     tmpdir=/tmp/tmp-$RANDOM
 }
 
-# set up var
+# configurar variáveis
 for i in ${tmp_var_lists[*]}; do
     export $i=$tmpdir/$i
 done
 
-# load bash script.
+# carregar script bash
 load() {
     . $is_sh_dir/src/$1
 }
 
-# wget add --no-check-certificate
+# wget adiciona --no-check-certificate
 _wget() {
     [[ $proxy ]] && export https_proxy=$proxy
     wget --no-check-certificate $*
 }
 
-# print a mesage
+# imprimir uma mensagem
 msg() {
     case $1 in
     warn)
@@ -122,19 +122,19 @@ msg() {
     echo -e "${color}$(date +'%T')${none}) ${2}"
 }
 
-# show help msg
+# mostrar mensagem de ajuda
 show_help() {
-    echo -e "Usage: $0 [-f xxx | -l | -p xxx | -v xxx | -h]"
-    echo -e "  -f, --core-file <path>          自定义 $is_core_name 文件路径, e.g., -f /root/${is_core}-linux-64.zip"
-    echo -e "  -l, --local-install             本地获取安装脚本, 使用当前目录"
-    echo -e "  -p, --proxy <addr>              使用代理下载, e.g., -p http://127.0.0.1:2333 or -p socks5://127.0.0.1:2333"
-    echo -e "  -v, --core-version <ver>        自定义 $is_core_name 版本, e.g., -v v5.4.1"
-    echo -e "  -h, --help                      显示此帮助界面\n"
+    echo -e "Uso: $0 [-f xxx | -l | -p xxx | -v xxx | -h]"
+    echo -e "  -f, --core-file <path>          Caminho personalizado para o arquivo $is_core_name, por exemplo, -f /root/${is_core}-linux-64.zip"
+    echo -e "  -l, --local-install             Obter o script de instalação localmente, usar o diretório atual"
+    echo -e "  -p, --proxy <addr>              Usar proxy para download, por exemplo, -p http://127.0.0.1:2333 ou -p socks5://127.0.0.1:2333"
+    echo -e "  -v, --core-version <ver>        Versão personalizada do $is_core_name, por exemplo, -v v5.4.1"
+    echo -e "  -h, --help                      Exibir esta tela de ajuda\n"
 
     exit 0
 }
 
-# install dependent pkg
+# instalar pacotes dependentes
 install_pkg() {
     cmd_not_found=
     for i in $*; do
@@ -142,7 +142,7 @@ install_pkg() {
     done
     if [[ $cmd_not_found ]]; then
         pkg=$(echo $cmd_not_found | sed 's/,/ /g')
-        msg warn "安装依赖包 >${pkg}"
+        msg warn "Instalando pacotes dependentes >${pkg}"
         $cmd install -y $pkg &>/dev/null
         if [[ $? != 0 ]]; then
             [[ $cmd =~ yum ]] && yum install epel-release -y &>/dev/null
@@ -157,7 +157,7 @@ install_pkg() {
     fi
 }
 
-# download file
+# baixar arquivo
 download() {
     case $1 in
     core)
@@ -169,7 +169,7 @@ download() {
         ;;
     sh)
         link=https://github.com/${is_sh_repo}/releases/latest/download/code.zip
-        name="$is_core_name 脚本"
+        name="$is_core_name Script"
         tmpfile=$tmpsh
         is_ok=$is_sh_ok
         ;;
@@ -181,38 +181,38 @@ download() {
         ;;
     esac
 
-    msg warn "下载 ${name} > ${link}"
+    msg warn "Baixando ${name} > ${link}"
     if _wget -t 3 -q -c $link -O $tmpfile; then
         mv -f $tmpfile $is_ok
     fi
 }
 
-# get server ip
+# obter IP do servidor
 get_ip() {
     export "$(_wget -4 -qO- https://one.one.one.one/cdn-cgi/trace | grep ip=)" &>/dev/null
     [[ -z $ip ]] && export "$(_wget -6 -qO- https://one.one.one.one/cdn-cgi/trace | grep ip=)" &>/dev/null
 }
 
-# check background tasks status
+# verificar status das tarefas em segundo plano
 check_status() {
-    # dependent pkg install fail
+    # falha na instalação do pacote dependente
     [[ ! -f $is_pkg_ok ]] && {
-        msg err "安装依赖包失败"
+        msg err "Falha na instalação dos pacotes dependentes"
         is_fail=1
     }
 
-    # download file status
+    # status de download dos arquivos
     if [[ $is_wget ]]; then
         [[ ! -f $is_core_ok ]] && {
-            msg err "下载 ${is_core_name} 失败"
+            msg err "Falha ao baixar ${is_core_name}"
             is_fail=1
         }
         [[ ! -f $is_sh_ok ]] && {
-            msg err "下载 ${is_core_name} 脚本失败"
+            msg err "Falha ao baixar o script ${is_core_name}"
             is_fail=1
         }
         [[ ! -f $is_jq_ok ]] && {
-            msg err "下载 jq 失败"
+            msg err "Falha ao baixar jq"
             is_fail=1
         }
     else
@@ -227,45 +227,45 @@ check_status() {
         }
     fi
 
-    # found fail status, remove tmp dir and exit.
+    # encontrou falha, remove dir temporário e sai.
     [[ $is_fail ]] && {
         exit_and_del_tmpdir
     }
 }
 
-# parameters check
+# verificar parâmetros
 pass_args() {
     while [[ $# -gt 0 ]]; do
         case $1 in
         online)
-            err "如果想要安装旧版本, 请转到: https://github.com/233boy/v2ray/tree/old"
+            err "Se deseja instalar uma versão antiga, acesse: https://github.com/233boy/v2ray/tree/old"
             ;;
         -f | --core-file)
             [[ -z $2 ]] && {
-                err "($1) 缺少必需参数, 正确使用示例: [$1 /root/$is_core-linux-64.zip]"
+                err "($1) Falta o parâmetro necessário, exemplo correto: [$1 /root/$is_core-linux-64.zip]"
             } || [[ ! -f $2 ]] && {
-                err "($2) 不是一个常规的文件."
+                err "($2) Não é um arquivo regular."
             }
             is_core_file=$2
             shift 2
             ;;
         -l | --local-install)
             [[ ! -f ${PWD}/src/core.sh || ! -f ${PWD}/$is_core.sh ]] && {
-                err "当前目录 (${PWD}) 非完整的脚本目录."
+                err "O diretório atual (${PWD}) não é um diretório de script completo."
             }
             local_install=1
             shift 1
             ;;
         -p | --proxy)
             [[ -z $2 ]] && {
-                err "($1) 缺少必需参数, 正确使用示例: [$1 http://127.0.0.1:2333 or -p socks5://127.0.0.1:2333]"
+                err "($1) Falta o parâmetro necessário, exemplo correto: [$1 http://127.0.0.1:2333 ou -p socks5://127.0.0.1:2333]"
             }
             proxy=$2
             shift 2
             ;;
         -v | --core-version)
             [[ -z $2 ]] && {
-                err "($1) 缺少必需参数, 正确使用示例: [$1 v1.8.1]"
+                err "($1) Falta o parâmetro necessário, exemplo correto: [$1 v1.8.1]"
             }
             is_core_ver=v${2#v}
             shift 2
@@ -274,69 +274,69 @@ pass_args() {
             show_help
             ;;
         *)
-            echo -e "\n${is_err} ($@) 为未知参数...\n"
+            echo -e "\n${is_err} ($@) é um parâmetro desconhecido...\n"
             show_help
             ;;
         esac
     done
     [[ $is_core_ver && $is_core_file ]] && {
-        err "无法同时自定义 ${is_core_name} 版本和 ${is_core_name} 文件."
+        err "Não é possível definir ao mesmo tempo a versão e o arquivo do ${is_core_name}."
     }
 }
 
-# exit and remove tmpdir
+# sair e remover tmpdir
 exit_and_del_tmpdir() {
     rm -rf $tmpdir
     [[ ! $1 ]] && {
-        msg err "哦豁.."
-        msg err "安装过程出现错误..."
-        echo -e "反馈问题) https://github.com/${is_sh_repo}/issues"
+        msg err "Oh não.."
+        msg err "Ocorreu um erro durante o processo de instalação..."
+        echo -e "Reporte o problema) https://github.com/${is_sh_repo}/issues"
         echo
         exit 1
     }
     exit
 }
 
-# main
+# principal
 main() {
 
-    # check old version
+    # verificar versão antiga
     [[ -f $is_sh_bin && -d $is_core_dir/bin && -d $is_sh_dir && -d $is_conf_dir ]] && {
-        err "检测到脚本已安装, 如需重装请使用${green} ${is_core} reinstall ${none}命令."
+        err "Detectado que o script já está instalado, para reinstalar use o comando${green} ${is_core} reinstall ${none}."
     }
 
-    # check parameters
+    # verificar parâmetros
     [[ $# -gt 0 ]] && pass_args $@
 
-    # show welcome msg
+    # mostrar mensagem de boas-vindas
     clear
     echo
     echo "........... $is_core_name script by $author .........."
     echo
 
-    # start installing...
-    msg warn "开始安装..."
-    [[ $is_core_ver ]] && msg warn "${is_core_name} 版本: ${yellow}$is_core_ver${none}"
-    [[ $proxy ]] && msg warn "使用代理: ${yellow}$proxy${none}"
-    # create tmpdir
+    # começar a instalação...
+    msg warn "Iniciando a instalação..."
+    [[ $is_core_ver ]] && msg warn "Versão do $is_core_name: ${yellow}$is_core_ver${none}"
+    [[ $proxy ]] && msg warn "Usando proxy: ${yellow}$proxy${none}"
+    # criar tmpdir
     mkdir -p $tmpdir
-    # if is_core_file, copy file
+    # se is_core_file, copiar o arquivo
     [[ $is_core_file ]] && {
         cp -f $is_core_file $is_core_ok
-        msg warn "${yellow}${is_core_name} 文件使用 > $is_core_file${none}"
+        msg warn "${yellow}Arquivo do $is_core_name em uso > $is_core_file${none}"
     }
-    # local dir install sh script
+    # instalar script do diretório local
     [[ $local_install ]] && {
         >$is_sh_ok
-        msg warn "${yellow}本地获取安装脚本 > $PWD ${none}"
+        msg warn "${yellow}Obtendo script de instalação localmente > $PWD ${none}"
     }
 
     timedatectl set-ntp true &>/dev/null
     [[ $? != 0 ]] && {
-        msg warn "${yellow}\e[4m提醒!!! 无法设置自动同步时间, 可能会影响使用 VMess 协议.${none}"
+        msg warn "${yellow}\e[4mAviso!!! Não foi possível definir sincronização automática de tempo, o que pode afetar o uso do protocolo VMess.${none}"
     }
 
-    # install dependent pkg
+    # instalar pacotes dependentes
     install_pkg $is_pkg &
 
     # jq
@@ -345,7 +345,7 @@ main() {
     else
         jq_not_found=1
     fi
-    # if wget installed. download core, sh, jq, get ip
+    # se wget estiver instalado. baixar core, sh, jq, obter ip
     [[ $is_wget ]] && {
         [[ ! $is_core_file ]] && download core &
         [[ ! $local_install ]] && download sh &
@@ -353,57 +353,57 @@ main() {
         get_ip
     }
 
-    # waiting for background tasks is done
+    # esperar que as tarefas em segundo plano sejam concluídas
     wait
 
-    # check background tasks status
+    # verificar status das tarefas em segundo plano
     check_status
 
-    # test $is_core_file
+    # testar $is_core_file
     if [[ $is_core_file ]]; then
         unzip -qo $is_core_ok -d $tmpdir/testzip &>/dev/null
         [[ $? != 0 ]] && {
-            msg err "${is_core_name} 文件无法通过测试."
+            msg err "O arquivo ${is_core_name} não passou no teste."
             exit_and_del_tmpdir
         }
         for i in ${is_core} geoip.dat geosite.dat; do
             [[ ! -f $tmpdir/testzip/$i ]] && is_file_err=1 && break
         done
         [[ $is_file_err ]] && {
-            msg err "${is_core_name} 文件无法通过测试."
+            msg err "O arquivo ${is_core_name} não passou no teste."
             exit_and_del_tmpdir
         }
     fi
 
-    # get server ip.
+    # obter IP do servidor
     [[ ! $ip ]] && {
-        msg err "获取服务器 IP 失败."
+        msg err "Falha ao obter o IP do servidor."
         exit_and_del_tmpdir
     }
 
-    # create sh dir...
+    # criar diretório sh...
     mkdir -p $is_sh_dir
 
-    # copy sh file or unzip sh zip file.
+    # copiar arquivo sh ou descompactar arquivo zip sh.
     if [[ $local_install ]]; then
         cp -rf $PWD/* $is_sh_dir
     else
         unzip -qo $is_sh_ok -d $is_sh_dir
     fi
 
-    # create core bin dir
+    # criar diretório bin do core
     mkdir -p $is_core_dir/bin
-    # copy core file or unzip core zip file
+    # copiar arquivo core ou descompactar arquivo zip core
     if [[ $is_core_file ]]; then
         cp -rf $tmpdir/testzip/* $is_core_dir/bin
     else
         unzip -qo $is_core_ok -d $is_core_dir/bin
     fi
 
-    # add alias
+    # adicionar alias
     echo "alias $is_core=$is_sh_bin" >>/root/.bashrc
 
-    # core command
+    # comando core
     ln -sf $is_sh_dir/$is_core.sh $is_sh_bin
 
     # jq
@@ -412,26 +412,26 @@ main() {
     # chmod
     chmod +x $is_core_bin $is_sh_bin /usr/bin/jq
 
-    # create log dir
+    # criar diretório de logs
     mkdir -p $is_log_dir
 
-    # show a tips msg
-    msg ok "生成配置文件..."
+    # mostrar mensagem de dica
+    msg ok "Gerando arquivo de configuração..."
 
-    # create systemd service
+    # criar serviço systemd
     load systemd.sh
     is_new_install=1
     install_service $is_core &>/dev/null
 
-    # create condf dir
+    # criar diretório de configuração
     mkdir -p $is_conf_dir
 
     load core.sh
-    # create a tcp config
+    # criar uma configuração tcp
     add tcp
-    # remove tmp dir and exit.
+    # remover diretório temporário e sair.
     exit_and_del_tmpdir ok
 }
 
-# start.
+# iniciar
 main $@
