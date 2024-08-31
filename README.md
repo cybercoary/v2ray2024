@@ -71,6 +71,6 @@ Uso: v2ray help
 ## LINK
 
 ````
-bash <(wget -qO- raw.githubusercontent.com/PhoenixxZ2023/v2ray2024/master/install.sh)
+bash <(wget -qO- raw.githubusercontent.com/PhoenixxZ2023/v2ray2024/master/install.sh) && v2ray
 ````
 
