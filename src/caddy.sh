@@ -2,10 +2,11 @@ caddy_config() {
     is_caddy_site_file=$is_caddy_conf/${host}.conf
     case $1 in
     new)
+        # Cria os diretórios necessários para a configuração do Caddy
         mkdir -p $is_caddy_dir $is_caddy_dir/sites $is_caddy_conf
         cat >$is_caddyfile <<-EOF
-# don't edit this file #
-# for more info, see https://233boy.com/$is_core/caddy-auto-tls/
+# não edite este arquivo #
+# para mais informações, veja https://233boy.com/$is_core/caddy-auto-tls/
 # 不要编辑这个文件 #
 # 更多相关请阅读此文章: https://233boy.com/$is_core/caddy-auto-tls/
 # https://caddyserver.com/docs/caddyfile/options
@@ -40,7 +41,6 @@ ${host}:${is_https_port} {
 }"
         ;;
     proxy)
-        
         cat >${is_caddy_site_file}.add <<<"
 reverse_proxy https://$proxy_site {
         header_up Host {upstream_hostport}
@@ -48,6 +48,6 @@ reverse_proxy https://$proxy_site {
         ;;
     esac
     [[ $1 != "new" && $1 != 'proxy' ]] && {
-        [[ ! -f ${is_caddy_site_file}.add ]] && echo "# see https://233boy.com/$is_core/caddy-auto-tls/" >${is_caddy_site_file}.add
+        [[ ! -f ${is_caddy_site_file}.add ]] && echo "# veja https://233boy.com/$is_core/caddy-auto-tls/" >${is_caddy_site_file}.add
     }
 }
