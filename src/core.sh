@@ -39,56 +39,56 @@ header_type_list=(
     wireguard
 )
 mainmenu=(
-    "添加配置"
-    "更改配置"
-    "查看配置"
-    "删除配置"
-    "运行管理"
-    "更新"
-    "卸载"
-    "帮助"
-    "其他"
-    "关于"
+    "Adicionar Configuração"
+    "Alterar Configuração"
+    "Ver Configuração"
+    "Remover Configuração"
+    "Gerenciar Execução"
+    "Atualizar"
+    "Desinstalar"
+    "Ajuda"
+    "Outros"
+    "Sobre"
 )
 info_list=(
-    "协议 (protocol)"
-    "地址 (address)"
-    "端口 (port)"
-    "用户ID (id)"
-    "传输协议 (network)"
-    "伪装类型 (type)"
-    "伪装域名 (host)"
-    "路径 (path)"
-    "传输层安全 (TLS)"
+    "Protocolo (protocol)"
+    "Endereço (address)"
+    "Porta (port)"
+    "ID de Usuário (id)"
+    "Protocolo de Transporte (network)"
+    "Tipo de Camuflagem (type)"
+    "Domínio de Camuflagem (host)"
+    "Caminho (path)"
+    "Segurança da Camada de Transporte (TLS (TLS)"
     "mKCP seed"
-    "密码 (password)"
-    "加密方式 (encryption)"
-    "链接 (URL)"
-    "目标地址 (remote addr)"
-    "目标端口 (remote port)"
-    "流控 (flow)"
-    "SNI (serverName)"
-    "指纹 (Fingerprint)"
-    "公钥 (Public key)"
-    "用户名 (Username)"
+    "Senha (password)"
+    "Método de Criptografia (encryption)"
+    "URL (URL)"
+    "Endereço de Destino (remote addr)"
+    "Porta de Destino (remote port)"
+    "Controle de Fluxo (flow)"
+    "SNI (Nome do Servidor) (serverName)"
+    "Impressão Digital (Fingerprint)"
+    "Chave Pública (Public key)"
+    "Usuario (Username)"
 )
 change_list=(
-    "更改协议"
-    "更改端口"
-    "更改域名"
-    "更改路径"
-    "更改密码"
-    "更改 UUID"
-    "更改加密方式"
-    "更改伪装类型"
-    "更改目标地址"
-    "更改目标端口"
-    "更改密钥"
-    "更改 SNI (serverName)"
-    "更改动态端口"
-    "更改伪装网站"
-    "更改 mKCP seed"
-    "更改用户名 (Username)"
+    "Alterar Protocolo"
+    "Alterar Porta"
+    "Alterar Domínio"
+    "Alterar Caminho"
+    "Alterar Senha"
+    "Alterar UUID"
+    "Alterar Método de Criptografia"
+    "Alterar Tipo de Camuflagem"
+    "Alterar Endereço de Destino"
+    "Alterar Porta de Destino"
+    "Alterar Chave"
+    "Alterar SNI (Nome do Servidor)"
+    "Alterar Porta Dinâmica"
+    "Alterar Site de Camuflagem"
+    "Alterar Semente mKCP"
+    "Alterar Nome de Usuário"
 )
 servername_list=(
     www.amazon.com
@@ -114,7 +114,7 @@ msg_ul() {
 # pause
 pause() {
     echo
-    echo -ne "按 $(_green Enter 回车键) 继续, 或按 $(_red Ctrl + C) 取消."
+    echo -ne "Pressione $(_green Enter) para continuar, ou pressione $(_red Ctrl + C) para cancelar."
     read -rs -d $'\n'
     echo
 }
@@ -137,7 +137,7 @@ get_port() {
     while :; do
         ((is_count++))
         if [[ $is_count -ge 233 ]]; then
-            err "自动获取可用端口失败次数达到 233 次, 请检查端口占用情况."
+            err "Falha ao obter porta disponível automaticamente após 233 tentativas. Verifique a ocupação das portas."
         fi
         tmp_port=$(shuf -i 445-65535 -n 1)
         [[ ! $(is_test port_used $tmp_port) && $tmp_port != $port ]] && break
@@ -202,7 +202,7 @@ is_port_used() {
         return
     fi
     is_cant_test_port=1
-    msg "$is_warn 无法检测端口是否可用."
+    msg "$is_warn Não foi possível verificar se a porta está disponível."
     msg "请执行: $(_yellow "${cmd} update -y; ${cmd} install net-tools -y") 来修复此问题."
 }
 
