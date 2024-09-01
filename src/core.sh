@@ -1237,7 +1237,7 @@ get() {
             if [[ $is_dynamic_port ]]; then
                 is_dynamic_port_file=$is_conf_dir/$is_dynamic_port
                 is_dynamic_port_range=$(jq -r '.inbounds[0].port' $is_dynamic_port_file)
-                [[ $? != 0 ]] && err "Não foi possível ler o arquivo de portas dinâmicas: $is_dynamic_port"
+                [[ $? != 0 ]] && err "无法读取动态端口文件: $is_dynamic_port"
             fi
             if [[ $is_caddy && $host && -f $is_caddy_conf/$host.conf ]]; then
                 is_tmp_https_port=$(egrep -o "$host:[1-9][0-9]?+" $is_caddy_conf/$host.conf | sed s/.*://)
@@ -1306,7 +1306,7 @@ get() {
             json_str='settings:{auth:"password",accounts:[{user:'\"$is_socks_user\"',pass:'\"$is_socks_pass\"'}],udp:true}'
             ;;
         *)
-            err "Não foi possível reconhecer o protocolo: $is_config_file"
+            err "无法识别协议: $is_config_file"
             ;;
         esac
         [[ $net ]] && return # if net exist, dont need more json args
@@ -1360,7 +1360,7 @@ get() {
             json_str=''"$is_server_id_json"','"$is_stream"''
             ;;
         *)
-            err "Não foi possível reconhecer o protocolo de transporte: $is_config_file"
+            err "无法识别传输协议: $is_config_file"
             ;;
         esac
         ;;
@@ -1376,19 +1376,19 @@ get() {
         ;;
     dynamic-port-test) # test dynamic port
         [[ ! $(is_test port ${is_use_dynamic_port_start}) || ! $(is_test port ${is_use_dynamic_port_end}) ]] && {
-            err "Não foi possível processar corretamente o intervalo de portas dinâmicas ($is_use_dynamic_port_start-$is_use_dynamic_port_end)."
+            err "无法正确处理动态端口 ($is_use_dynamic_port_start-$is_use_dynamic_port_end) 范围."
         }
         [[ $(is_test port_used $is_use_dynamic_port_start) ]] && {
-            err "Portas dinâmicas ($is_use_dynamic_port_start-$is_use_dynamic_port_end), mas a porta ($is_use_dynamic_port_start) não está disponível."
+            err "动态端口 ($is_use_dynamic_port_start-$is_use_dynamic_port_end), 但 ($is_use_dynamic_port_start) 端口无法使用."
         }
         [[ $(is_test port_used $is_use_dynamic_port_end) ]] && {
-            err "Portas dinâmicas ($is_use_dynamic_port_start-$is_use_dynamic_port_end), mas a porta ($is_use_dynamic_port_end) não está disponível."
+            err "动态端口 ($is_use_dynamic_port_start-$is_use_dynamic_port_end), 但 ($is_use_dynamic_port_end) 端口无法使用."
         }
         [[ $is_use_dynamic_port_end -le $is_use_dynamic_port_start ]] && {
-            err "Não foi possível processar corretamente o intervalo de portas dinâmicas ($is_use_dynamic_port_start-$is_use_dynamic_port_end)."
+            err "无法正确处理动态端口 ($is_use_dynamic_port_start-$is_use_dynamic_port_end) 范围."
         }
         [[ $is_use_dynamic_port_start == $port || $is_use_dynamic_port_end == $port ]] && {
-            err "O intervalo de portas dinâmicas ($is_use_dynamic_port_start-$is_use_dynamic_port_end) conflita com a porta principal ($port)."
+            err "动态端口 ($is_use_dynamic_port_start-$is_use_dynamic_port_end) 范围和主端口 ($port) 冲突."
         }
         is_dynamic_port_range="$is_use_dynamic_port_start-$is_use_dynamic_port_end"
         ;;
@@ -1397,19 +1397,19 @@ get() {
         get_ip
         get ping
         if [[ ! $(grep $ip <<<$is_host_dns) ]]; then
-            msg "\nPor favor, aponte ($(_red_bg $host)) para ($(_red_bg $ip))"
-            msg "\nSe estiver usando Cloudflare, no DNS, desative o (Proxy status / Status do proxy) e configure como (DNS only / Somente DNS)."
-            ask string y "Eu confirmei que a resolução está correta [y]:"
+            msg "\n请将 ($(_red_bg $host)) 解析到 ($(_red_bg $ip))"
+            msg "\n如果使用 Cloudflare, 在 DNS 那; 关闭 (Proxy status / 代理状态), 即是 (DNS only / 仅限 DNS)"
+            ask string y "我已经确定解析 [y]:"
             get ping
             if [[ ! $(grep $ip <<<$is_host_dns) ]]; then
-                _cyan "\nResultado do teste: $is_host_dns"
-                err "O domínio ($host) não está apontando para ($ip)"
+                _cyan "\n测试结果: $is_host_dns"
+                err "域名 ($host) 没有解析到 ($ip)"
             fi
         fi
         ;;
     ssss | ss2022)
         openssl rand -base64 32
-        [[ $? != 0 ]] && err "Não foi possível gerar a senha do Shadowsocks 2022. Por favor, instale o OpenSSL."
+        [[ $? != 0 ]] && err "无法生成 Shadowsocks 2022 密码, 请安装 openssl."
         ;;
     ping)
         # is_ip_type="-4"
@@ -1420,18 +1420,18 @@ get() {
         is_host_dns=$(_wget -qO- --header="accept: application/dns-json" "https://one.one.one.one/dns-query?name=$host&type=$is_dns_type")
         ;;
     log | logerr)
-        msg "\nAviso: Pressione $(_green Ctrl + C) para sair\n"
+        msg "\n 提醒: 按 $(_green Ctrl + C) 退出\n"
         [[ $1 == 'log' ]] && tail -f $is_log_dir/access.log
         [[ $1 == 'logerr' ]] && tail -f $is_log_dir/error.log
         ;;
     install-caddy)
-        _green "\nInstalando o Caddy para configurar TLS automaticamente.\n"
+        _green "\n安装 Caddy 实现自动配置 TLS.\n"
         load download.sh
         download caddy
         load systemd.sh
         install_service caddy &>/dev/null
         is_caddy=1
-        _green "Instalação do Caddy concluída com sucesso.\n"
+        _green "安装 Caddy 成功.\n"
         ;;
     reinstall)
         is_install_sh=$(cat $is_sh_dir/install.sh)
@@ -1441,34 +1441,34 @@ get() {
     test-run)
         systemctl list-units --full -all &>/dev/null
         [[ $? != 0 ]] && {
-            _yellow "\nNão foi possível executar o teste. Por favor, verifique o status do systemctl.\n"
+            _yellow "\n无法执行测试, 请检查 systemctl 状态.\n"
             return
         }
         is_no_manage_msg=1
         if [[ ! $(pgrep -f $is_core_bin) ]]; then
-            _yellow "\nTestando $is_core_name ..\n"
+            _yellow "\n测试运行 $is_core_name ..\n"
             manage start &>/dev/null
             if [[ $is_run_fail == $is_core ]]; then
-                _red "$is_core_name Falha ao executar:"
+                _red "$is_core_name 运行失败信息:"
                 $is_core_bin $is_with_run_arg -c $is_config_json -confdir $is_conf_dir
             else
-                _green "\nTeste bem-sucedido, $is_core_name foi iniciado.\n"
+                _green "\n测试通过, 已启动 $is_core_name ..\n"
             fi
         else
-            _green "\n$is_core_name está em execução, pulando o teste.\n"
+            _green "\n$is_core_name 正在运行, 跳过测试\n"
         fi
         if [[ $is_caddy ]]; then
             if [[ ! $(pgrep -f $is_caddy_bin) ]]; then
-                _yellow "\nTestando o Caddy ..\n"
+                _yellow "\n测试运行 Caddy ..\n"
                 manage start caddy &>/dev/null
                 if [[ $is_run_fail == 'caddy' ]]; then
-                    _red "Informações sobre a falha na execução do Caddy:"
+                    _red "Caddy 运行失败信息:"
                     $is_caddy_bin run --config $is_caddyfile
                 else
-                    _green "\nTeste bem-sucedido, Caddy foi iniciado.\n"
+                    _green "\n测试通过, 已启动 Caddy ..\n"
                 fi
             else
-                _green "\nO Caddy está em execução, pulando o teste.\n"
+                _green "\nCaddy 正在运行, 跳过测试\n"
             fi
         fi
         ;;
@@ -1491,7 +1491,7 @@ info() {
         is_tmp_port=$port
         [[ $is_dynamic_port ]] && {
             is_can_change+=(12)
-            is_tmp_port="Porta: $port & Portas dinâmicas: $is_dynamic_port_range"
+            is_tmp_port="$port & 动态端口: $is_dynamic_port_range"
         }
         [[ $kcp_seed ]] && {
             is_info_show+=(9)
@@ -1564,7 +1564,7 @@ info() {
         msg "$a $tt= \e[${is_color}m${is_info_str[$i]}\e[0m"
     done
     if [[ $is_new_install ]]; then
-        warn "Para a instalação inicial, consulte a documentação do script: $(msg_ul https://233boy.com/$is_core/$is_core-script/)"
+        warn "首次安装请查看脚本帮助文档: $(msg_ul https://233boy.com/$is_core/$is_core-script/)"
     fi
     if [[ $is_url ]]; then
         msg "------------- ${info_list[12]} -------------"
@@ -1574,23 +1574,23 @@ info() {
         is_tmp_path=$path
         [[ $net == 'grpc' ]] && is_tmp_path="/$path/*"
         msg "------------- no-auto-tls INFO -------------"
-        msg "Porta (port): $port"
-        msg "Caminho (path): $is_tmp_path"
-        msg "\e[41m Ajuda \e[0m: $(msg_ul https://233boy.com/$is_core/no-auto-tls/)"
+        msg "端口(port): $port"
+        msg "路径(path): $is_tmp_path"
+        msg "\e[41m帮助(help)\e[0m: $(msg_ul https://233boy.com/$is_core/no-auto-tls/)"
     fi
     footer_msg
 }
 
 # footer msg
 footer_msg() {
-    [[ $is_core_stop && ! $is_new_json ]] && warn "$is_core_name está atualmente parado."
-    [[ $is_caddy_stop && $host ]] && warn "O Caddy está atualmente parado."
+    [[ $is_core_stop && ! $is_new_json ]] && warn "$is_core_name 当前处于停止状态."
+    [[ $is_caddy_stop && $host ]] && warn "Caddy 当前处于停止状态."
     ####### 要点13脸吗只会改我链接的小人 #######
     unset c n m s b
     msg "------------- END -------------"
-    msg "Acompanhe (tg): $(msg_ul https://t.me/tg2333)"
-    msg "Documentação (doc): $(msg_ul https://233boy.com/$is_core/$is_core-script/)"
-    msg "Promoção (ads): Recomendações de aeroportos ($is_core_name services): $(msg_ul https://g${c}e${n}t${m}j${s}m${b}s.com/)\n"
+    msg "关注(tg): $(msg_ul https://t.me/tg2333)"
+    msg "文档(doc): $(msg_ul https://233boy.com/$is_core/$is_core-script/)"
+    msg "推广(ads): 机场推荐($is_core_name services): $(msg_ul https://g${c}e${n}t${m}j${s}m${b}s.com/)\n"
     ####### 要点13脸吗只会改我链接的小人 #######
 }
 
@@ -1613,15 +1613,15 @@ url_qr() {
                 msg "请安装 qrencode: $(_green "$cmd update -y; $cmd install qrencode -y")"
             fi
             msg
-            msg "Se não for possível exibir ou reconhecer corretamente, por favor, use o link abaixo para gerar o QR Code:"
+            msg "如果无法正常显示或识别, 请使用下面的链接来生成二维码:"
             msg "\n\e[4;${is_color}m${link}\e[0m\n"
             footer_msg
         }
     else
         [[ $1 == 'url' ]] && {
-            err "Não foi possível gerar o link URL para ($is_config_name)."
+            err "($is_config_name) 无法生成 URL 链接."
         } || {
-            err "Não foi possível gerar o QR Code para ($is_config_name)."
+            err "($is_config_name) 无法生成 QR code 二维码."
         }
     fi
 }
@@ -1637,41 +1637,41 @@ update() {
         ;;
     2 | sh)
         is_update_name=sh
-        is_show_name="$is_core_name script"
+        is_show_name="$is_core_name 脚本"
         is_run_ver=$is_sh_ver
         is_update_repo=$is_sh_repo
         ;;
     3 | caddy)
-        [[ ! $is_caddy ]] && err "Atualização do Caddy não suportada."
+        [[ ! $is_caddy ]] && err "不支持更新 Caddy."
         is_update_name=caddy
         is_show_name="Caddy"
         is_run_ver=$is_caddy_ver
         is_update_repo=$is_caddy_repo
         ;;
     *)
-        err "Não foi possível reconhecer ($1). Por favor, use: $is_core update [core | sh | caddy] [ver]"
+        err "无法识别 ($1), 请使用: $is_core update [core | sh | caddy] [ver]"
         ;;
     esac
     [[ $2 ]] && is_new_ver=v${2#v}
     [[ $is_run_ver == $is_new_ver ]] && {
-        msg "\nA versão personalizada é a mesma que a versão atual do $is_show_name. Nenhuma atualização necessária.\n"
+        msg "\n自定义版本和当前 $is_show_name 版本一样, 无需更新.\n"
         exit
     }
     load download.sh
     if [[ $is_new_ver ]]; then
-        msg "\nAtualizando $is_show_name para a versão personalizada: $(_green $is_new_ver)\n"
+        msg "\n使用自定义版本更新 $is_show_name: $(_green $is_new_ver)\n"
     else
         get_latest_version $is_update_name
         [[ $is_run_ver == $latest_ver ]] && {
-            msg "\nO $is_show_name já está na versão mais recente.\n"
+            msg "\n$is_show_name 当前已经是最新版本了.\n"
             exit
         }
-        msg "\nNova versão do $is_show_name encontrada: $(_green $latest_ver)\n"
+        msg "\n发现 $is_show_name 新版本: $(_green $latest_ver)\n"
         is_new_ver=$latest_ver
     fi
     download $is_update_name $is_new_ver
-    msg "Atualização concluída com sucesso. A versão atual do $is_show_name é: $(_green $is_new_ver)\n"
-    msg "$(_green Veja as notas de atualização: https://github.com/$is_update_repo/releases/tag/$is_new_ver)\n"
+    msg "更新成功, 当前 $is_show_name 版本: $(_green $is_new_ver)\n"
+    msg "$(_green 请查看更新说明: https://github.com/$is_update_repo/releases/tag/$is_new_ver)\n"
     [[ $is_update_name == 'core' ]] && $is_core restart
     [[ $is_update_name == 'caddy' ]] && manage restart $is_update_name &
 }
@@ -1680,7 +1680,7 @@ update() {
 is_main_menu() {
     msg "\n------------- $is_core_name script $is_sh_ver by $author -------------"
     msg "$is_core_ver: $is_core_status"
-    msg "Grupo (Chat): $(msg_ul https://t.me/tg233boy)"
+    msg "群组 (Chat): $(msg_ul https://t.me/tg233boy)"
     is_main_start=1
     ask mainmenu
     case $REPLY in
@@ -1697,14 +1697,14 @@ is_main_menu() {
         del
         ;;
     5)
-        ask list is_do_manage "Iniciar Parar Reiniciar"
+        ask list is_do_manage "启动 停止 重启"
         manage $REPLY &
-        msg "\nEstado de gerenciamento em execução: $(_green $is_do_manage)\n""
+        msg "\n管理状态执行: $(_green $is_do_manage)\n"
         ;;
     6)
-        is_tmp_list=("Atualizar $is_core_name" "Atualizar script")
-        [[ $is_caddy ]] && is_tmp_list+=("Atualizar Caddy")
-        ask list is_do_update null "\nPor favor, selecione a atualização:\n"
+        is_tmp_list=("更新$is_core_name" "更新脚本")
+        [[ $is_caddy ]] && is_tmp_list+=("更新Caddy")
+        ask list is_do_update null "\n请选择更新:\n"
         update $REPLY
         ;;
     7)
@@ -1716,7 +1716,7 @@ is_main_menu() {
         show_help
         ;;
     9)
-        ask list is_do_other "Ativar BBR Ver logs Ver logs de erro Testar execução Reinstalar script Configurar DNS"
+        ask list is_do_other "启用BBR 查看日志 查看错误日志 测试运行 重装脚本 设置DNS"
         case $REPLY in
         1)
             load bbr.sh
@@ -1757,7 +1757,7 @@ main() {
         ;;
     api | bin | convert | tls | run | uuid)
         [[ $is_core_ver_lt_5 ]] && {
-            warn "A versão $is_core_ver não suporta o uso de comandos. Por favor, atualize a versão do kernel: $is_core update core"
+            warn "$is_core_ver 版本不支持使用命令. 请升级内核版本: $is_core update core"
             return
         }
         is_run_command=$1
@@ -1804,7 +1804,7 @@ main() {
         *)
             is_dont_auto_exit=1
             [[ ! $2 ]] && {
-                err "Não foi possível encontrar o parâmetro que precisa ser removido"
+                err "无法找到需要删除的参数"
             } || {
                 for v in ${@:2}; do
                     del $v
@@ -1823,7 +1823,7 @@ main() {
     debug)
         is_debug=1
         get info $2
-        warn "Se for necessário copiar, por favor, modifique os valores de *uuid, *password, *host, *key para evitar vazamento de informações."
+        warn "如果需要复制; 请把 *uuid, *password, *host, *key 的值改写, 以避免泄露."
         ;;
     fix-config.json)
         create config.json
@@ -1833,9 +1833,9 @@ main() {
             load caddy.sh
             caddy_config new
             manage restart caddy &
-            _green "\nCorreção concluída.\n"
+            _green "\nfix 完成.\n"
         else
-            err "Não é possível executar esta operação"
+            err "无法执行此操作"
         fi
         ;;
     i | info)
@@ -1865,7 +1865,7 @@ main() {
         if [[ $2 == 'dat' ]]; then
             load download.sh
             download dat
-            msg "$(_green Atualização de geoip.dat e geosite.dat bem-sucedida.)\n"
+            msg "$(_green 更新 geoip.dat geosite.dat 成功.)\n"
             manage restart &
         else
             update $is_update_name $is_update_ver
@@ -1879,7 +1879,7 @@ main() {
         [[ $is_caddy ]] && msg "Caddy $is_caddy_ver: $is_caddy_status\n"
         ;;
     start | stop | r | restart)
-        [[ $2 && $2 != 'caddy' ]] && err "Não é possível reconhecer ($2), por favor use: $is_core $1 [caddy]"
+        [[ $2 && $2 != 'caddy' ]] && err "无法识别 ($2), 请使用: $is_core $1 [caddy]"
         manage $1 $2 &
         ;;
     t | test)
@@ -1917,7 +1917,7 @@ main() {
                 change
             }
         else
-            err "Não é possível reconhecer ($1), para obter ajuda, use: $is_core help"
+            err "无法识别 ($1), 获取帮助请使用: $is_core help"
         fi
         ;;
     esac
