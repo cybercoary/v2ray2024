@@ -212,8 +212,8 @@ ask() {
     set_ss_method)
         is_tmp_list=(${ss_method_list[@]})
         is_default_arg=$is_random_ss_method
-        is_opt_msg="\n请选择加密方式:\n"
-        is_opt_input_msg="(默认\e[92m $is_default_arg\e[0m):"
+        is_opt_msg="\nEscolha o método de criptografia:\n"
+        is_opt_input_msg="(Padrão\e[92m $is_default_arg\e[0m):"
         is_ask_set=ss_method
         ;;
     set_header_type)
@@ -223,8 +223,8 @@ ask() {
             is_tmp_list=(none http)
             is_default_arg=none
         }
-        is_opt_msg="\n请选择伪装类型:\n"
-        is_opt_input_msg="(默认\e[92m $is_default_arg\e[0m):"
+       is_opt_msg="\nEscolha o tipo de camuflagem:\n"
+       is_opt_input_msg="(Padrão\e[92m $is_default_arg\e[0m):"
         is_ask_set=header_type
         [[ $is_use_header_type ]] && return
         ;;
@@ -236,7 +236,7 @@ ask() {
                 [[ $(grep -i tls$ <<<$v) ]] && is_tmp_list=(${is_tmp_list[@]} $v)
             done
         }
-        is_opt_msg="\n请选择协议:\n"
+        is_opt_msg="\nEscolha o protocolo:\n"
         is_ask_set=is_new_protocol
         ;;
     set_change_list)
@@ -244,7 +244,7 @@ ask() {
         for v in ${is_can_change[@]}; do
             is_tmp_list+=("${change_list[$v]}")
         done
-        is_opt_msg="\n请选择更改:\n"
+        is_opt_msg="\nEscolha a alteração:\n"
         is_ask_set=is_change_str
         is_opt_input_msg=$3
         ;;
@@ -260,7 +260,7 @@ ask() {
         ;;
     get_config_file)
         is_tmp_list=("${is_all_json[@]}")
-        is_opt_msg="\n请选择配置:\n"
+        is_opt_msg="\nEscolha a configuração:\n"
         is_ask_set=is_config_file
         ;;
     mainmenu)
@@ -270,7 +270,7 @@ ask() {
         ;;
     esac
     msg $is_opt_msg
-    [[ ! $is_opt_input_msg ]] && is_opt_input_msg="请选择 [\e[91m1-${#is_tmp_list[@]}\e[0m]:"
+    [[ ! $is_opt_input_msg ]] && is_opt_input_msg="Escolha [\e[91m1-${#is_tmp_list[@]}\e[0m]:"
     [[ $is_tmp_list ]] && show_list "${is_tmp_list[@]}"
     while :; do
         echo -ne $is_opt_input_msg
@@ -283,7 +283,7 @@ ask() {
         if [[ ! $is_tmp_list ]]; then
             [[ $(grep port <<<$is_ask_set) ]] && {
                 [[ ! $(is_test port "$REPLY") ]] && {
-                    msg "$is_err 请输入正确的端口, 可选(1-65535)"
+                    msg "$is_err Digite uma porta válida, entre 1 e 65535."
                     continue
                 }
                 if [[ $(is_test port_used $REPLY) && $is_ask_set != 'door_port' ]]; then
@@ -293,12 +293,12 @@ ask() {
             }
             [[ $(grep path <<<$is_ask_set) && ! $(is_test path "$REPLY") ]] && {
                 [[ ! $tmp_uuid ]] && get_uuid
-                msg "$is_err 请输入正确的路径, 例如: /$tmp_uuid"
+                msg "$is_err Digite um caminho válido, por exemplo: /$tmp_uuid"
                 continue
             }
             [[ $(grep uuid <<<$is_ask_set) && ! $(is_test uuid "$REPLY") ]] && {
                 [[ ! $tmp_uuid ]] && get_uuid
-                msg "$is_err 请输入正确的 UUID, 例如: $tmp_uuid"
+                msg "$is_err Digite um UUID válido, por exemplo: $tmp_uuid"
                 continue
             }
             [[ $(grep ^y$ <<<$is_ask_set) ]] && {
@@ -306,13 +306,13 @@ ask() {
                 msg "请输入 (y)"
                 continue
             }
-            [[ $REPLY ]] && export $is_ask_set=$REPLY && msg "使用: ${!is_ask_set}" && break
+            [[ $REPLY ]] && export $is_ask_set=$REPLY && msg "Usando: ${!is_ask_set}" && break
         else
             [[ $(is_test number "$REPLY") ]] && is_ask_result=${is_tmp_list[$REPLY - 1]}
-            [[ $is_ask_result ]] && export $is_ask_set="$is_ask_result" && msg "选择: ${!is_ask_set}" && break
+            [[ $is_ask_result ]] && export $is_ask_set="$is_ask_result" && msg "Escolha: ${!is_ask_set}" && break
         fi
 
-        msg "输入${is_err}"
+       msg "Digite ${is_err}"
     done
     unset is_opt_msg is_opt_input_msg is_tmp_list is_ask_result is_default_arg is_emtpy_exit
 }
@@ -382,7 +382,7 @@ create() {
         is_tls=tls
         is_client=1
         get info $2
-        [[ ! $is_client_id_json ]] && err "($is_config_name) 不支持生成客户端配置."
+        [[ ! $is_client_id_json ]] && err "($is_config_name) não suporta a geração de configuração do cliente."
         is_new_json=$(jq '{outbounds:[{tag:'\"$is_config_name\"',protocol:'\"$is_protocol\"','"$is_client_id_json"','"$is_stream"'}]}' <<<{})
         if [[ $is_full_client ]]; then
             is_dns='dns:{servers:[{address:"223.5.5.5",domain:["geosite:cn","geosite:geolocation-cn"],expectIPs:["geoip:cn"]},"1.1.1.1","8.8.8.8"]}'
@@ -483,7 +483,7 @@ change() {
             ;;
         *)
             [[ $is_try_change ]] && return
-            err "无法识别 ($2) 更改类型."
+            err "Não é possível reconhecer o tipo de alteração ($2)."
             ;;
         esac
     fi
@@ -494,12 +494,12 @@ change() {
         [[ $is_change_id ]] && {
             is_change_msg=${change_list[$is_change_id]}
             [[ $is_change_id == 'full' ]] && {
-                [[ $3 ]] && is_change_msg="更改多个参数" || is_change_msg=
+                [[ $3 ]] && is_change_msg="Alterar vários parâmetros" || is_change_msg=
             }
-            [[ $is_change_msg ]] && _green "\n快速执行: $is_change_msg"
+            [[ $is_change_msg ]] && _green "\nExecução rápida: $is_change_msg"
         }
         info $1
-        [[ $is_auto_get_config ]] && msg "\n自动选择: $is_config_file"
+        [[ $is_auto_get_config ]] && msg "\nEscolha automática: $is_config_file"
     }
     is_old_net=$net
     [[ $is_protocol == 'vless' && ! $is_reality ]] && net=v$net
@@ -525,13 +525,13 @@ change() {
     1)
         # new port
         is_new_port=$3
-        [[ $host && ! $is_caddy ]] && err "($is_config_file) 不支持更改端口, 因为没啥意义."
+        [[ $host && ! $is_caddy ]] && err "($is_config_file) não suporta alteração de porta, pois não faz sentido."
         if [[ $is_new_port && ! $is_auto ]]; then
-            [[ ! $(is_test port $is_new_port) ]] && err "请输入正确的端口, 可选(1-65535)"
-            [[ $is_new_port != 443 && $(is_test port_used $is_new_port) ]] && err "无法使用 ($is_new_port) 端口"
+            [[ ! $(is_test port $is_new_port) ]] && err "Digite uma porta válida, entre 1 e 65535"
+            [[ $is_new_port != 443 && $(is_test port_used $is_new_port) ]] && err "Não é possível usar a porta ($is_new_port)"
         fi
         [[ $is_auto ]] && get_port && is_new_port=$tmp_port
-        [[ ! $is_new_port ]] && ask string is_new_port "请输入新端口:"
+        [[ ! $is_new_port ]] && ask string is_new_port "Digite o novo número da porta:"
         if [[ $is_caddy && $host ]]; then
             net=$is_old_net
             is_https_port=$is_new_port
@@ -546,17 +546,17 @@ change() {
     2)
         # new host
         is_new_host=$3
-        [[ ! $host ]] && err "($is_config_file) 不支持更改域名."
-        [[ ! $is_new_host ]] && ask string is_new_host "请输入新域名:"
+        [[ ! $host ]] && err "($is_config_file) não suporta alteração de domínio."
+        [[ ! $is_new_host ]] && ask string is_new_host "Digite o novo domínio:"
         old_host=$host # del old host
         add $net $is_new_host
         ;;
     3)
         # new path
         is_new_path=$3
-        [[ ! $path ]] && err "($is_config_file) 不支持更改路径."
+        [[ ! $path ]] && err "($is_config_file) não suporta alteração de caminho."
         [[ $is_auto ]] && get_uuid && is_new_path=/$tmp_uuid
-        [[ ! $is_new_path ]] && ask string is_new_path "请输入新路径:"
+        [[ ! $is_new_path ]] && ask string is_new_path "Digite o novo caminho:"
         add $net auto auto $is_new_path
         ;;
     4)
@@ -565,9 +565,9 @@ change() {
         if [[ $net == 'ss' || $is_trojan || $is_socks_pass ]]; then
             [[ $is_auto ]] && get_uuid && is_new_pass=$tmp_uuid
         else
-            err "($is_config_file) 不支持更改密码."
+            err "($is_config_file) não suporta alteração de senha."
         fi
-        [[ ! $is_new_pass ]] && ask string is_new_pass "请输入新密码:"
+        [[ ! $is_new_pass ]] && ask string is_new_pass "Digite a nova senha:"
         trojan_password=$is_new_pass
         ss_password=$is_new_pass
         is_socks_pass=$is_new_pass
@@ -576,15 +576,15 @@ change() {
     5)
         # new uuid
         is_new_uuid=$3
-        [[ ! $uuid ]] && err "($is_config_file) 不支持更改 UUID."
+        [[ ! $uuid ]] && err "($is_config_file) não suporta alteração de UUID."
         [[ $is_auto ]] && get_uuid && is_new_uuid=$tmp_uuid
-        [[ ! $is_new_uuid ]] && ask string is_new_uuid "请输入新 UUID:"
+        [[ ! $is_new_uuid ]] && ask string is_new_uuid "Digite o novo UUID:"
         add $net auto $is_new_uuid
         ;;
     6)
         # new method
         is_new_method=$3
-        [[ $net != 'ss' ]] && err "($is_config_file) 不支持更改加密方式."
+        [[ $net != 'ss' ]] && err "($is_config_file) não suporta alteração do método de criptografia."
         [[ $is_auto ]] && is_new_method=$is_random_ss_method
         [[ ! $is_new_method ]] && {
             ask set_ss_method
@@ -595,7 +595,7 @@ change() {
     7)
         # new header type
         is_new_header_type=$3
-        [[ ! $header_type ]] && err "($is_config_file) 不支持更改伪装类型."
+        [[ ! $header_type ]] && err "($is_config_file) não suporta alteração do tipo de camuflagem."
         [[ $is_auto ]] && {
             is_new_header_type=$is_random_header_type
             if [[ $net == 'tcp' ]]; then
@@ -612,17 +612,17 @@ change() {
     8)
         # new remote addr
         is_new_door_addr=$3
-        [[ $net != 'door' ]] && err "($is_config_file) 不支持更改目标地址."
-        [[ ! $is_new_door_addr ]] && ask string is_new_door_addr "请输入新的目标地址:"
+        [[ $net != 'door' ]] && err "($is_config_file) não suporta alteração do endereço de destino."
+        [[ ! $is_new_door_addr ]] && ask string is_new_door_addr "Digite o novo endereço de destino:"
         door_addr=$is_new_door_addr
         add $net
         ;;
     9)
         # new remote port
         is_new_door_port=$3
-        [[ $net != 'door' ]] && err "($is_config_file) 不支持更改目标端口."
+        [[ $net != 'door' ]] && err "($is_config_file) não suporta alteração da porta de destino."
         [[ ! $is_new_door_port ]] && {
-            ask string door_port "请输入新的目标端口:"
+            ask string door_port "Digite a nova porta de destino:"
             is_new_door_port=$door_port
         }
         add $net auto auto $is_new_door_port
@@ -631,18 +631,18 @@ change() {
         # new is_private_key is_public_key
         is_new_private_key=$3
         is_new_public_key=$4
-        [[ ! $is_reality ]] && err "($is_config_file) 不支持更改密钥."
+        [[ ! $is_reality ]] && err "($is_config_file) não suporta alteração da chave."
         if [[ $is_auto ]]; then
             get_pbk
             add $net
         else
             [[ $is_new_private_key && ! $is_new_public_key ]] && {
-                err "无法找到 Public key."
+                err "Não foi possível encontrar a chave pública."
             }
-            [[ ! $is_new_private_key ]] && ask string is_new_private_key "请输入新 Private key:"
-            [[ ! $is_new_public_key ]] && ask string is_new_public_key "请输入新 Public key:"
+            [[ ! $is_new_private_key ]] && ask string is_new_private_key "Digite a nova chave privada:"
+            [[ ! $is_new_public_key ]] && ask string is_new_public_key "Digite a nova chave pública:"
             if [[ $is_new_private_key == $is_new_public_key ]]; then
-                err "Private key 和 Public key 不能一样."
+                err "A chave privada e a chave pública não podem ser iguais."
             fi
             is_private_key=$is_new_private_key
             is_test_json=1
@@ -650,14 +650,14 @@ change() {
             create server $is_protocol-$net
             $is_core_bin -test <<<"$is_new_json" &>/dev/null
             if [[ $? != 0 ]]; then
-                err "Private key 无法通过测试."
+                err "A chave privada não passou no teste."
             fi
             is_private_key=$is_new_public_key
             # create server $is_protocol-$net | $is_core_bin -test &>/dev/null
             create server $is_protocol-$net
             $is_core_bin -test <<<"$is_new_json" &>/dev/null
             if [[ $? != 0 ]]; then
-                err "Public key 无法通过测试."
+                err "A chave pública não passou no teste."
             fi
             is_private_key=$is_new_private_key
             is_public_key=$is_new_public_key
@@ -668,12 +668,12 @@ change() {
     11)
         # new serverName
         is_new_servername=$3
-        [[ ! $is_reality ]] && err "($is_config_file) 不支持更改 serverName."
+        [[ ! $is_reality ]] && err "($is_config_file) não suporta alteração do serverName."
         [[ $is_auto ]] && is_new_servername=$is_random_servername
-        [[ ! $is_new_servername ]] && ask string is_new_servername "请输入新的 serverName:"
+        [[ ! $is_new_servername ]] && ask string is_new_servername "Digite o novo serverName:"
         is_servername=$is_new_servername
         [[ $(grep -i "^233boy.com$" <<<$is_servername) ]] && {
-            err "你干嘛～哎呦～"
+            err "O que você está fazendo? Ai ai!"
         }
         add $net
         ;;
@@ -681,16 +681,16 @@ change() {
         # new dynamic-port
         is_new_dynamic_port_start=$3
         is_new_dynamic_port_end=$4
-        [[ ! $is_dynamic_port ]] && err "($is_config_file) 不支持更改动态端口."
+        [[ ! $is_dynamic_port ]] && err "($is_config_file) não suporta alteração da porta dinâmica."
         if [[ $is_auto ]]; then
             get dynamic-port
             add $net
         else
             [[ $is_new_dynamic_port_start && ! $is_new_dynamic_port_end ]] && {
-                err "无法找到动态结束端口."
+                err "Não foi possível encontrar a porta final dinâmica."
             }
-            [[ ! $is_new_dynamic_port_start ]] && ask string is_new_dynamic_port_start "请输入新的动态开始端口:"
-            [[ ! $is_new_dynamic_port_end ]] && ask string is_new_dynamic_port_end "请输入新的动态结束端口:"
+            [[ ! $is_new_dynamic_port_start ]] && ask string is_new_dynamic_port_start "Digite a nova porta inicial dinâmica:"
+            [[ ! $is_new_dynamic_port_end ]] && ask string is_new_dynamic_port_end "Digite a nova porta final dinâmica:"
             add $net auto auto auto $is_new_dynamic_port_start $is_new_dynamic_port_end
         fi
         ;;
@@ -698,33 +698,33 @@ change() {
         # new proxy site
         is_new_proxy_site=$3
         [[ ! $is_caddy && ! $host ]] && {
-            err "($is_config_file) 不支持更改伪装网站."
+            err "($is_config_file) não suporta alteração do site de camuflagem."
         }
-        [[ ! -f $is_caddy_conf/${host}.conf.add ]] && err "无法配置伪装网站."
-        [[ ! $is_new_proxy_site ]] && ask string is_new_proxy_site "请输入新的伪装网站 (例如 example.com):"
+        [[ ! -f $is_caddy_conf/${host}.conf.add ]] && err "Não é possível configurar o site de camuflagem."
+        [[ ! $is_new_proxy_site ]] && ask string is_new_proxy_site "Digite o novo site de camuflagem (por exemplo, example.com):"
         proxy_site=$(sed 's#^.*//##;s#/$##' <<<$is_new_proxy_site)
         [[ $(grep -i "^233boy.com$" <<<$proxy_site) ]] && {
-            err "你干嘛～哎呦～"
+            err "O que você está fazendo? Ai ai!"
         } || {
             load caddy.sh
             caddy_config proxy
             manage restart caddy &
         }
-        msg "\n已更新伪装网站为: $(_green $proxy_site) \n"
+        msg "\nO site de camuflagem foi atualizado para: $(_green $proxy_site) \n"
         ;;
     14)
         # new kcp seed
         is_new_kcp_seed=$3
-        [[ ! $kcp_seed ]] && err "($is_config_file) 不支持更改 mKCP seed."
+        [[ ! $kcp_seed ]] && err "($is_config_file) não suporta alteração da semente mKCP."
         [[ $is_auto ]] && get_uuid && is_new_kcp_seed=$tmp_uuid
-        [[ ! $is_new_kcp_seed ]] && ask string is_new_kcp_seed "请输入新 mKCP seed:"
+        [[ ! $is_new_kcp_seed ]] && ask string is_new_kcp_seed "Digite a nova semente mKCP:"
         kcp_seed=$is_new_kcp_seed
         add $net
         ;;
     15)
         # new socks user
-        [[ ! $is_socks_user ]] && err "($is_config_file) 不支持更改用户名 (Username)."
-        ask string is_socks_user "请输入新用户名 (Username):"
+        [[ ! $is_socks_user ]] && err "($is_config_file) não suporta alteração do nome de usuário (Username)."
+        ask string is_socks_user "Digite o novo nome de usuário (Username):"
         add $net
         ;;
     esac
