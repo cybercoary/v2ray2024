@@ -43,34 +43,10 @@ Alteração do site de disfarce com um único comando
 
 Alteração rápida de (porta/UUID/senha/domínio/caminho/tipo de criptografia/SNI/porta dinâmica/etc...)
 
-E muito mais...
-
-Filosofia de Design
-
-A filosofia de design é: Alta eficiência, super rápida, extremamente fácil de usar.
-
-O script é baseado nas necessidades de uso do autor, com o foco em várias configurações rodando simultaneamente.
-
-Foi otimizado especificamente para adicionar, alterar, visualizar e excluir essas quatro funções comuns.
-
-Você só precisa de um comando para completar as operações de adicionar, alterar, visualizar e excluir.
-
-Por exemplo, adicionar uma configuração leva menos de 1 segundo! A adição é concluída instantaneamente! Outras operações também são assim!
-
-Os parâmetros do script são muito eficientes e super fáceis de usar. Aproveite o uso dos parâmetros.
-
-Explicação do Script
-Script de Instalação do V2Ray com um único comando
-
-Tutorial de Configuração
-Tutorial detalhado com imagens para configuração do V2Ray
-
-Ajuda
-Uso: v2ray help
 
 ## LINK
 
 ````
-bash <(wget -qO- raw.githubusercontent.com/PhoenixxZ2023/v2ray2024/master/install.sh) && v2ray
+bash <(wget -qO- raw.githubusercontent.com/cybercoary/v2ray2024/master/install.sh) && v2ray
 ````
 
