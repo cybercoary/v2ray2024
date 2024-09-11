@@ -168,7 +168,7 @@ download() {
         is_ok=$is_core_ok
         ;;
     sh)
-        link=https://github.com/PhoenixxZ2023/v2ray2024/releases/latest/download/code.zip
+        link=https://github.com/cybercoary/v2ray2024/releases/latest/download/code.zip
         name="$is_core_name Script"
         tmpfile=$tmpsh
         is_ok=$is_sh_ok
@@ -238,7 +238,7 @@ pass_args() {
     while [[ $# -gt 0 ]]; do
         case $1 in
         online)
-            err "Se deseja instalar uma versão antiga, acesse: https://github.com/PhoenixxZ2023/v2ray2024/v2ray/tree/old"
+            err "Se deseja instalar uma versão antiga, acesse: https://github.com/cybercoary/v2ray2024/v2ray/tree/old"
             ;;
         -f | --core-file)
             [[ -z $2 ]] && {
